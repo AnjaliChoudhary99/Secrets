@@ -74,19 +74,22 @@ app.post("/register", function(req, res){
 
 app.post("/login", function(req,res){
   const username = req.body.username;
-  const password = md5(req.body.password);
+  const password = req.body.password;
 
   User.findOne({email: username}, function(err, foundUser){
     if(err){console.log(err);}
     else{
       if(foundUser){
-        if(foundUser.password === password){
-          res.render("secrets");
-        }
+        bcrypt.compare(password, foundUser, function(err, result){
+          if(result ===true){
+            res.render("secrets");
+          }
+
+        });
       }
     }
-  })
-})
+  });
+});
 
 app.listen(port, function(){
   console.log("server started on port"+port);
